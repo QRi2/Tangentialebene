@@ -147,6 +147,9 @@ public class Ebene implements IDrawElement {
 		
 		planeVerteciesXZ.setCoordinates(0, eckenXZ);
 		Shape3D plane = new Shape3D(planeVerteciesXZ);
+		if(!active && ! isTangentialEbene && !zeichneSteigung){
+			plane.setAppearance(getTransparentAppearance(false));
+		}
 		if (active) {
 			plane.setAppearance(getAppearance(Color.RED));
 		} if (isTangentialEbene) {
@@ -156,9 +159,6 @@ public class Ebene implements IDrawElement {
 		{
 			plane.setAppearance(getTransparentAppearance(true));
 		}
-		else {
-				plane.setAppearance(getTransparentAppearance(false));
-			}
 
 		ebene.addChild(plane);
 		return ebene;
@@ -198,12 +198,12 @@ public class Ebene implements IDrawElement {
 	
 		
 			if (steigung > 0.5) {
-				optik.setColoringAttributes(new ColoringAttributes((int)Math.floor(255 * steigung), (int)(Math.floor(255*(1-steigung))),0, 0));
+				optik.setColoringAttributes(new ColoringAttributes((int)(Math.floor(255*(1-(steigung*-1)))),(int)Math.floor(255 * (steigung*-1)),0, 0));
 			}if( steigung<=0.5){
-				optik.setColoringAttributes(new ColoringAttributes((int)Math.floor(255 * (1-steigung)), (int)(Math.floor(255*steigung)),0, 0));
+					optik.setColoringAttributes(new ColoringAttributes((int)Math.floor(255 * steigung), (int)(Math.floor(255*(1-steigung))),0, 0));
 			}
 			if (steigung<-0.5){
-				optik.setColoringAttributes(new ColoringAttributes((int)(Math.floor(255*(1-(steigung*-1)))),(int)Math.floor(255 * (steigung*-1)),0, 0));
+				optik.setColoringAttributes(new ColoringAttributes((int)Math.floor(255 * (1-steigung)), (int)(Math.floor(255*steigung)),0, 0));
 			}
 			
 		optik.setTransparencyAttributes(ta);
