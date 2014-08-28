@@ -91,7 +91,7 @@ public class Koordinatensystem extends JFrame {
 	private void erstellen() {
 		this.setSize(preferredSize + 200, preferredSize);
 		this.setLocation(50, 50);
-		this.setResizable(false);
+		this.setResizable(true);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		this.canvas = new Canvas3D(SimpleUniverse.getPreferredConfiguration());
