@@ -12,12 +12,24 @@ public class FunktionC extends R2Funktion {
 
 	@Override
 	public double getPartielleAbleitungX(double x, double y) {
-		return -(4*Math.PI*x*Math.pow(Math.E, Math.sin((2*Math.PI) / (Math.pow(x,2)+Math.pow(y,2) + 1))*Math.cos((2*Math.PI)/(Math.pow(x,2)+Math.pow(y,2) + 1))))/Math.pow((Math.pow(x,2)+Math.pow(y,2) + 1), 2);
+		return -(4*Math.PI*x*
+				Math.pow(Math.E, Math.sin(
+						(2*Math.PI) / (Math.pow(x,2)+Math.pow(y,2) + 1)
+					))*Math.cos(
+						(2*Math.PI)/(Math.pow(x,2)+Math.pow(y,2) + 1)
+					)
+				)/Math.pow((Math.pow(x,2)+Math.pow(y,2) + 1), 2);
 	}
 
 	@Override
 	public double getPartielleAbleitungY(double x, double y) {
-		return -(4*Math.PI*y*Math.pow(Math.E, Math.sin((2*Math.PI) / (Math.pow(x,2)+Math.pow(y,2) + 1))*Math.cos((2*Math.PI)/(Math.pow(x,2)+Math.pow(y,2) + 1))))/Math.pow((Math.pow(x,2)+Math.pow(y,2) + 1), 2);
+		return -(4*Math.PI*y*
+					Math.pow(Math.E, Math.sin(
+							(2*Math.PI) / (Math.pow(x,2)+Math.pow(y,2) + 1)
+						))*Math.cos(
+							(2*Math.PI)/(Math.pow(x,2)+Math.pow(y,2) + 1)
+						)
+					)/Math.pow((Math.pow(x,2)+Math.pow(y,2) + 1), 2);
 	}
 }
 

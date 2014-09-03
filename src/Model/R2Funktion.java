@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.media.j3d.BranchGroup;
 import javax.vecmath.Point3d;
+import javax.vecmath.Vector2d;
 
 /**
  * 
@@ -71,6 +72,7 @@ public abstract class R2Funktion implements IDrawElement {
 			}
 
 		}
+
 		for (Ebene e : ebenenliste) {
 			bg.addChild(e.draw());
 		}
@@ -94,5 +96,12 @@ public abstract class R2Funktion implements IDrawElement {
 
 	//TODO: Kommentieren
 	public abstract double getPartielleAbleitungY(double x, double y);
+	
+	public Vector2d getGradient(double x, double y)
+	{
+		double px = this.getPartielleAbleitungX(x, y),
+				py = this.getPartielleAbleitungY(x, y);
+		return new Vector2d(px, py);
+	}
 	
 }
