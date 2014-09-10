@@ -11,6 +11,7 @@ import javax.media.j3d.Shape3D;
 import javax.media.j3d.TransparencyAttributes;
 import javax.vecmath.Matrix3d;
 import javax.vecmath.Point3d;
+import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
 
 import View.Koordinatensystem;
@@ -25,9 +26,10 @@ public class Ebene implements IDrawElement {
 	public boolean isSteigung = false;
 	public boolean zeichneSteigung = false;
 	public double Anstieg;
-	public double steigung;
+	public double steigungX, steigungY;
+	private Vector2d gradient;
 
-	public Ebene(Point3d p1, Point3d p2, Point3d p3, Point3d p4){
+	public Ebene(Point3d p1, Point3d p2, Point3d p3, Point3d p4) {
 		this.p1 = p1;
 		this.p2 = p2;
 		this.p3 = p3;
@@ -37,19 +39,16 @@ public class Ebene implements IDrawElement {
 
 	public Ebene(Point3d p1, Point3d p2, Point3d p3, Point3d p4,
 			R2Funktion funktion) {
+		double x = p1.x;
+		double y = p1.z;
 		this.p1 = p1;
 		this.p2 = p2;
 		this.p3 = p3;
 		this.p4 = p4;
-		this.steigung = funktion.getPartielleAbleitungX(p1.y, p1.y);
+		this.steigungX = funktion.getPartielleAbleitungX(x, y);
+		this.steigungY = funktion.getPartielleAbleitungY(x, y);
 		this.isSteigung = funktion.zeichneSteigung;
-	}
-
-	public Ebene() {
-		p1 = new Point3d(0.5, 0, 0);
-		p2 = new Point3d(0, 0, 0.5);
-		p3 = new Point3d(-0.5, 0, 0);
-		p4 = new Point3d(0, 0, -0.5); 
+		this.gradient = funktion.getGradient(x, y);
 	}
 
 	public Ebene EbenenScale(double scale) {
@@ -112,7 +111,7 @@ public class Ebene implements IDrawElement {
 
 		A.invert();
 		Vector3d x = Koordinatensystem.multiply(A, b);
-		
+
 		return x;
 	}
 
@@ -120,7 +119,7 @@ public class Ebene implements IDrawElement {
 		Vector3d p12 = new Vector3d(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z), p13 = new Vector3d(
 				p3.x - p1.x, p3.y - p1.y, p3.z - p1.z), n = new Vector3d();
 		n.cross(p12, p13);
-		
+
 		if (g.Richtungsvektor.dot(n) != 0) {
 			Vector3d x = this.SchnittpunktMitGerade(g);
 
@@ -144,19 +143,16 @@ public class Ebene implements IDrawElement {
 		eckenXZ[2] = p3;
 		eckenXZ[3] = p4;
 
-		
 		planeVerteciesXZ.setCoordinates(0, eckenXZ);
 		Shape3D plane = new Shape3D(planeVerteciesXZ);
-		if(!active && ! isTangentialEbene && !zeichneSteigung){
+		if (!active && !isTangentialEbene && !zeichneSteigung) {
 			plane.setAppearance(getTransparentAppearance(false));
 		}
 		if (active) {
 			plane.setAppearance(getAppearance(Color.RED));
-		} if (isTangentialEbene) {
+		} else if (isTangentialEbene) {
 			plane.setAppearance(getTransparentAppearance(Color.cyan));
-		} 
-		if(zeichneSteigung)
-		{
+		} else if (zeichneSteigung) {
 			plane.setAppearance(getTransparentAppearance(true));
 		}
 
@@ -187,35 +183,39 @@ public class Ebene implements IDrawElement {
 	}
 
 	public Appearance getTransparentAppearance(boolean fuerSteigung) {
-		if(fuerSteigung == true){
-		Appearance optik = new Appearance();
-		TransparencyAttributes ta = new TransparencyAttributes();
-		ta.setTransparencyMode(ta.NICEST);
-		ta.setTransparency(0.75f);
-		PolygonAttributes attribute = new PolygonAttributes(
-				PolygonAttributes.POLYGON_FILL, PolygonAttributes.CULL_NONE, 0f);
-		optik.setPolygonAttributes(attribute);
-	
-		
-			if (steigung > 0.5) {
-				optik.setColoringAttributes(new ColoringAttributes((int)(Math.floor(255*(1-(steigung*-1)))),(int)Math.floor(255 * (steigung*-1)),0, 0));
-			}if( steigung<=0.5){
-					optik.setColoringAttributes(new ColoringAttributes((int)Math.floor(255 * steigung), (int)(Math.floor(255*(1-steigung))),0, 0));
-			}
-			if (steigung<-0.5){
-				optik.setColoringAttributes(new ColoringAttributes((int)Math.floor(255 * (1-steigung)), (int)(Math.floor(255*steigung)),0, 0));
-			}
-			
-		optik.setTransparencyAttributes(ta);
+		if (fuerSteigung == true) {
+			Appearance optik = new Appearance();
+			TransparencyAttributes ta = new TransparencyAttributes();
+			ta.setTransparencyMode(ta.NICEST);
+			ta.setTransparency(0.75f);
+			PolygonAttributes attribute = new PolygonAttributes(
+					PolygonAttributes.POLYGON_FILL,
+					PolygonAttributes.CULL_NONE, 0f);
+			optik.setPolygonAttributes(attribute);
+			float r, g, b;
 
-		return optik;
-		}
-		else{
+			// Werte von Gradient werden in neuen Vektor kopiert
+			Vector2d richtung = new Vector2d(this.gradient);
+			richtung.normalize();
+			double steigung = (steigungX * richtung.x)
+					+ (steigungY * richtung.y);
+			if ((steigungX == 0) && (steigungY == 0)) {
+				steigung = 0;
+			}
+
+			r = (float) (steigung / 2);
+			g = 1f - (float) (steigung / 2);
+			b = 0;
+
+			optik.setColoringAttributes(new ColoringAttributes(r, g, b, 0));
+
+			optik.setTransparencyAttributes(ta);
+
+			return optik;
+		} else {
 			return this.getTransparentAppearance(Color.white);
 		}
 	}
-
-	
 
 	public Appearance getAppearance(Color farbe) {
 		Appearance optik = new Appearance();

@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.media.j3d.Appearance;
@@ -16,13 +15,11 @@ import javax.media.j3d.ColoringAttributes;
 import javax.media.j3d.Font3D;
 import javax.media.j3d.FontExtrusion;
 import javax.media.j3d.LineArray;
-import javax.media.j3d.Material;
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.Text3D;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
 import javax.swing.JFrame;
-import javax.vecmath.Color3f;
 import javax.vecmath.Matrix3d;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
@@ -33,6 +30,7 @@ import Model.Ebene;
 import Model.FunktionA;
 import Model.FunktionB;
 import Model.FunktionC;
+import Model.FunktionD;
 import Model.Gerade3D;
 import Model.R2Funktion;
 
@@ -51,8 +49,7 @@ public class Koordinatensystem extends JFrame {
 	
 	public boolean steigungErsichtlich = false;
 
-	// Transformknoten
-	private BranchGroup _bgMouseBehaviour;
+	// Transformknoten	
 	private TransformGroup _tgMouseBehaviour;
 
 	// BranchGroup der aktuellen Ebene
@@ -68,23 +65,25 @@ public class Koordinatensystem extends JFrame {
 	private boolean funktionSteht1 = false;
 	private boolean funktionSteht2 = false;
 	private boolean funktionSteht3 = false;
+	private boolean funktionSteht4 = false;
 	private boolean funktionSteht1mitAnstieg = false;
 	private boolean funktionSteht2mitAnstieg = false;
 	private boolean funktionSteht3mitAnstieg = false;
+	private boolean funktionSteht4mitAnstieg = false;
 	private boolean funktionSteht = false;
 
 	private double[][][] gatter;
-	private static Point3d start;
+	
+	private final boolean[] funktionsteht = new boolean[]{false,false,false,false,false};
+	private final boolean[] funktionMitAnstiegSteht = new boolean[]{false,false,false,false,false};
 
 	Canvas3D canvas;
-
-	// X & Y Position der Maus
+	
 	R2Funktion f;
 
 	public Koordinatensystem() {
 
-		super("Tangentialebene - Christopher Glania");
-
+		super("Tangentialebene - Christopher Glania - MTS_21");
 		erstellen();
 	}
 
@@ -95,7 +94,6 @@ public class Koordinatensystem extends JFrame {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		this.canvas = new Canvas3D(SimpleUniverse.getPreferredConfiguration());
-
 		this.add(canvas);
 
 		canvas.addMouseMotionListener(new MouseMotionListener() {
@@ -110,7 +108,6 @@ public class Koordinatensystem extends JFrame {
 				if (!tangentialEbeneSteht & funktionSteht) {
 					gatter = f.getgatter();
 
-					/*********************************************/
 					Transform3D t3 = new Transform3D();
 
 					Vector3d t = new Vector3d();
@@ -147,10 +144,7 @@ public class Koordinatensystem extends JFrame {
 					Vector3d startwert = multiply(R, cameraPosition);
 					// Um Startwert translation mitzugeben
 					startwert.add(t);
-
-					// Point3d[] array = calcStartEndPoint(richtung, startwert,
-					// 50);
-
+					
 					Gerade3D mausGerade = new Gerade3D(startwert, richtung);
 
 					double abstand = Double.MAX_VALUE;
@@ -207,20 +201,20 @@ public class Koordinatensystem extends JFrame {
 						_tgMouseBehaviour.removeChild(bgtan);
 					}
 
-					f = new FunktionA(150, -2, 2, false);
-					
+					f = new FunktionA(150, -2, 2, false);					
 					funktionSteht1 = true;
 					funktionSteht2 = false;
 					funktionSteht3 = false;
+					funktionSteht4 = false;
 					funktionSteht = true;
 					tangentialEbeneSteht = false;
 					gatter = f.getgatter();
 					steigungErsichtlich = false;
-					draw((bgFunktion = f.draw()));
-					//schnittMitMaus.active = false;
+					draw((bgFunktion =f.draw()));
 					funktionSteht1mitAnstieg = false;
 					funktionSteht2mitAnstieg = false;
 					funktionSteht3mitAnstieg = false;
+					funktionSteht4mitAnstieg = false;
 				}
 
 				if ((e.getKeyCode() == KeyEvent.VK_2) && !funktionSteht2) {
@@ -231,7 +225,6 @@ public class Koordinatensystem extends JFrame {
 					if (bgSchnittpunkt != null) {
 						_tgMouseBehaviour.removeChild(bgSchnittpunkt);
 						f.ebenenliste.clear();
-						//schnittMitMaus.active = false;
 					}
 					if(tangentialEbeneSteht){
 						_tgMouseBehaviour.removeChild(bgtan);
@@ -241,6 +234,7 @@ public class Koordinatensystem extends JFrame {
 					funktionSteht1 = false;
 					funktionSteht2 = true;
 					funktionSteht3 = false;
+					funktionSteht4 = false;
 					funktionSteht = true;
 					tangentialEbeneSteht = false;
 					steigungErsichtlich = false;
@@ -248,6 +242,7 @@ public class Koordinatensystem extends JFrame {
 					funktionSteht1mitAnstieg = false;
 					funktionSteht2mitAnstieg = false;
 					funktionSteht3mitAnstieg = false;
+					funktionSteht4mitAnstieg = false;
 				}
 
 				if ((e.getKeyCode() == KeyEvent.VK_3) && !funktionSteht3) {
@@ -257,7 +252,6 @@ public class Koordinatensystem extends JFrame {
 					if (bgSchnittpunkt != null) {
 						_tgMouseBehaviour.removeChild(bgSchnittpunkt);
 						f.ebenenliste.clear();
-						//schnittMitMaus.active = false;
 					}
 					if(tangentialEbeneSteht){
 						_tgMouseBehaviour.removeChild(bgtan);
@@ -268,6 +262,7 @@ public class Koordinatensystem extends JFrame {
 					funktionSteht1 = false;
 					funktionSteht2 = false;
 					funktionSteht3 = true;
+					funktionSteht4 = false;
 					funktionSteht = true;
 					tangentialEbeneSteht = false;
 					gatter = f.getgatter();
@@ -276,19 +271,46 @@ public class Koordinatensystem extends JFrame {
 					funktionSteht1mitAnstieg = false;
 					funktionSteht2mitAnstieg = false;
 					funktionSteht3mitAnstieg = false;
+					funktionSteht4mitAnstieg = false;
 
+				}
+				if((e.getKeyCode() == KeyEvent.VK_4) && !funktionSteht4) {
+					if (bgFunktion != null) {
+						_tgMouseBehaviour.removeChild(bgFunktion);
+					}
+					if (bgSchnittpunkt != null) {
+						_tgMouseBehaviour.removeChild(bgSchnittpunkt);
+						f.ebenenliste.clear();
+					}
+					if(tangentialEbeneSteht){
+						_tgMouseBehaviour.removeChild(bgtan);
+					}
+					
+					f = new FunktionD(150, -2, 2, false);
+					draw((bgFunktion = f.draw()));
+					funktionSteht1 = false;
+					funktionSteht2 = false;
+					funktionSteht3 = false;
+					funktionSteht4 = true;
+					funktionSteht = true;
+					tangentialEbeneSteht = false;
+					gatter = f.getgatter();
+					steigungErsichtlich = false;
+
+					funktionSteht1mitAnstieg = false;
+					funktionSteht2mitAnstieg = false;
+					funktionSteht3mitAnstieg = false;
+					funktionSteht4mitAnstieg = false;
 				}
 				if ((e.getKeyCode() == KeyEvent.VK_SPACE) && funktionSteht
 						&& (schnittMitMaus != null)) {
-					
-					
-					
-					
 					
 					Ebene tan = schnittMitMaus.EbenenScale(100);
 					bgtan = tan.draw();
 					draw(bgtan);
 					tangentialEbeneSteht = true;
+					
+					System.out.println(f.getPartielleAbleitungX(tan.p1.x, tan.p1.y) + ";"+f.getPartielleAbleitungY(tan.p1.x, tan.p1.y) );
 				}
 				if((e.getKeyCode() == KeyEvent.VK_A) && !steigungErsichtlich && funktionSteht){
 					steigungErsichtlich = true;
@@ -322,6 +344,11 @@ public class Koordinatensystem extends JFrame {
 						f= new FunktionC(150, -2, 2, true);
 						funktionSteht3 = false;
 						funktionSteht3mitAnstieg = true;
+					}
+					if(funktionSteht4 && !funktionSteht4mitAnstieg){
+						f= new FunktionD(150, -2, 2, true);
+						funktionSteht4 = false;
+						funktionSteht4mitAnstieg = true;
 					}
 					draw((bgFunktion = f.draw()));
 
@@ -490,8 +517,6 @@ public class Koordinatensystem extends JFrame {
 		return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)
 				+ Math.pow(z1 - z2, 2));
 	}
-	
-	
 
 	public BranchGroup getText(String uebergebenerText, Point3f position){
 		BranchGroup bgText = new BranchGroup();
@@ -502,7 +527,6 @@ public class Koordinatensystem extends JFrame {
 		Shape3D sh = new Shape3D();
 		sh.setGeometry(text);
 		
-		
 		TransformGroup tg = new TransformGroup();
 		Transform3D t3d = new Transform3D();
 		
@@ -510,15 +534,8 @@ public class Koordinatensystem extends JFrame {
 				position.y, position.z);
 		t3d.setTranslation(v3f);
 		
-		
-		
 		tg.setTransform(t3d);
 		tg.addChild(sh);
-		
-		
-		TransformGroup tg1 = new TransformGroup();
-		Transform3D t3d1 = new Transform3D();
-		
 		
 		bgText.addChild(tg);
 		return bgText;
@@ -681,24 +698,24 @@ public class Koordinatensystem extends JFrame {
 		_tgMouseBehaviour.addChild(bg);
 	}
 
-	private static Point3d[] calcStartEndPoint(Vector3d richtung,
-			Vector3d startwert, double scale) {
-		Vector3d neuRichtung = new Vector3d(richtung);
-		neuRichtung.scale(scale);
-
-		Vector3d endwert = add(startwert, neuRichtung);
-
-		start = new Point3d();
-		start.x = startwert.x;
-		start.y = startwert.y;
-		start.z = startwert.z;
-		//
-		Point3d end = new Point3d();
-		end.x = endwert.x;
-		end.y = endwert.y;
-		end.z = endwert.z;
-
-		Point3d[] array = new Point3d[] { start, end };
-		return array;
-	}
+//	private static Point3d[] calcStartEndPoint(Vector3d richtung,
+//			Vector3d startwert, double scale) {
+//		Vector3d neuRichtung = new Vector3d(richtung);
+//		neuRichtung.scale(scale);
+//
+//		Vector3d endwert = add(startwert, neuRichtung);
+//
+//		start = new Point3d();
+//		start.x = startwert.x;
+//		start.y = startwert.y;
+//		start.z = startwert.z;
+//		//
+//		Point3d end = new Point3d();
+//		end.x = endwert.x;
+//		end.y = endwert.y;
+//		end.z = endwert.z;
+//
+//		Point3d[] array = new Point3d[] { start, end };
+//		return array;
+//	}
 }
